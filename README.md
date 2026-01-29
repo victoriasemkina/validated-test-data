@@ -1,5 +1,5 @@
 # Validated Test Data
-[![Java CI with Maven](https://github.com/victoriasemkina/validated-test-data/actions/workflows/maven.yml/badge.svg)](https://github.com/victoriasemkina/validated-test-data/actions/workflows/maven.yml)
+
 > Современная Java-библиотека для генерации *гарантированно валидных* тестовых данных с использованием Java 17+ и принципов чистой архитектуры.
 
 [![Java](https://img.shields.io/badge/Java-17+-blue?logo=openjdk)](https://openjdk.org/)
