@@ -1,9 +1,9 @@
 # Validated Test Data
+[![Java CI with Maven](https://github.com/victoriasemkina/validated-test-data/actions/workflows/maven.yml/badge.svg)](https://github.com/victoriasemkina/validated-test-data/actions/workflows/maven.yml)
 > Современная Java-библиотека для генерации *гарантированно валидных* тестовых данных с использованием Java 17+ и принципов чистой архитектуры.
 
 [![Java](https://img.shields.io/badge/Java-17+-blue?logo=openjdk)](https://openjdk.org/)
 [![Лицензия](https://img.shields.io/badge/Лицензия-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Статус сборки](https://github.com/victoriasemkina/validated-test-data/actions/workflows/maven.yml/badge.svg)](https://github.com/victoriasemkina/validated-test-data/actions)
 
 ## 🎯 Зачем эта библиотека? (Это не просто ещё один Faker)
 
