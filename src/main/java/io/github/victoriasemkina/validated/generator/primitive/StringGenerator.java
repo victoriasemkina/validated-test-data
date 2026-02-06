@@ -1,5 +1,6 @@
-package io.github.victoriasemkina.validated.generator;
+package io.github.victoriasemkina.validated.generator.primitive;
 
+import io.github.victoriasemkina.validated.core.ValueGenerator;
 import io.github.victoriasemkina.validated.model.FieldDescriptor;
 import jakarta.validation.constraints.Size;
 import net.datafaker.Faker;

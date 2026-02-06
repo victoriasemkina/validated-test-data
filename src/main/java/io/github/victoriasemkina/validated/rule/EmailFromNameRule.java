@@ -1,69 +1,94 @@
 package io.github.victoriasemkina.validated.rule;
 
 import io.github.victoriasemkina.validated.model.FieldDescriptor;
-import jakarta.validation.constraints.Email;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
- * Правило: генерация email на основе firstName и lastName.
- *
- * Применяется если:
- * 1. Поле имеет аннотацию @Email с regexp = ".+@company\\.com"
- * 2. В контексте уже есть значения для полей "firstName" и "lastName"
+ * Правило для генерации корпоративного email на основе имени пользователя.
+ * Формат: {firstName}.{lastName}@company.com
  */
 public class EmailFromNameRule implements Rule {
 
+    // Поля с именем в порядке приоритета
+    private static final List<String> NAME_FIELDS = Arrays.asList(
+            "firstName", "first_name", "givenName",
+            "lastName", "last_name", "surname",
+            "name", "fullName", "full_name"
+    );
+
+    private static final String COMPANY_DOMAIN = "company.com";
+    private static final int PRIORITY = 100;
+
     @Override
-    public boolean matches(FieldDescriptor targetField, Map<String, Object> context) {
-        // 1. Проверяем, что это поле с аннотацией @Email
-        Optional<Email> emailAnnotation = targetField.findConstraint(Email.class);
-        if (emailAnnotation.isEmpty()) {
+    public boolean matches(FieldDescriptor field, Map<String, Object> context) {
+        // 1. Проверяем, что поле содержит "email" или "mail" в названии
+        String fieldName = field.name().toLowerCase();
+        boolean isEmailField = fieldName.contains("email") || fieldName.contains("mail");
+        if (!isEmailField) {
             return false;
         }
 
-        // 2. Проверяем специфичный regexp (если указан)
-        String regexp = emailAnnotation.get().regexp();
-        boolean isCompanyEmail = regexp.equals(".+@company\\.com");
-        boolean isDefaultEmail = regexp.isEmpty() || regexp.equals(".*");
-
-        // Правило применяется только для company email ИЛИ любых email
-        // если в контексте есть имена (можно настроить логику)
-        if (!isCompanyEmail && !isDefaultEmail) {
-            return false;
-        }
-
-        // 3. Проверяем, что в контексте есть нужные поля
-        boolean hasFirstName = context.containsKey("firstName");
-        boolean hasLastName = context.containsKey("lastName");
-
-        return hasFirstName && hasLastName;
+        // 2. Проверяем наличие имени в контексте
+        return hasNameInContext(context);
     }
 
     @Override
-    public Object generate(FieldDescriptor targetField, Map<String, Object> context) {
-        String firstName = (String) context.get("firstName");
-        String lastName = (String) context.get("lastName");
+    public Object generate(FieldDescriptor field, Map<String, Object> context) {
+        String firstName = extractField(context, "firstName", "first_name", "givenName", "name");
+        String lastName = extractField(context, "lastName", "last_name", "surname");
 
-        // Базовая логика: firstName.lastName@company.com
-        String emailName = firstName.toLowerCase() + "." + lastName.toLowerCase();
-
-        // Проверяем, какой домен нужен по аннотации
-        Optional<Email> emailAnnotation = targetField.findConstraint(Email.class);
-        if (emailAnnotation.isPresent()) {
-            String regexp = emailAnnotation.get().regexp();
-            if (regexp.equals(".+@company\\.com")) {
-                return emailName + "@company.com";
+        // Формируем локальную часть email
+        StringBuilder localPart = new StringBuilder();
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            localPart.append(normalize(firstName));
+        }
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            if (localPart.length() > 0) {
+                localPart.append("."); // ← ТОЧКА как разделитель (стандартный формат)
             }
+            localPart.append(normalize(lastName));
         }
 
-        // Fallback: любой домен
-        return emailName + "@example.com";
+        // Фолбэк если оба поля пустые
+        if (localPart.length() == 0) {
+            localPart.append("user");
+        }
+
+        return localPart.toString() + "@" + COMPANY_DOMAIN;
     }
 
     @Override
     public int getPriority() {
-        return 10; // Высокий приоритет
+        return PRIORITY;
+    }
+
+    private boolean hasNameInContext(Map<String, Object> context) {
+        return NAME_FIELDS.stream()
+                .anyMatch(context::containsKey);
+    }
+
+    private String extractField(Map<String, Object> context, String... candidates) {
+        for (String candidate : candidates) {
+            if (context.containsKey(candidate)) {
+                Object value = context.get(candidate);
+                if (value instanceof String str && !str.trim().isEmpty()) {
+                    return str.trim();
+                }
+            }
+        }
+        return null;
+    }
+
+    private String normalize(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return "";
+        }
+        // Оставляем только латинские буквы и цифры (удаляем спецсимволы, пробелы, кириллицу)
+        // НО точки и дефисы НЕ добавляем сюда — они удаляются, а точка добавляется явно как разделитель
+        return input.toLowerCase()
+                .replaceAll("[^a-z0-9]", ""); // удаляем всё кроме букв и цифр
     }
 }

@@ -61,14 +61,15 @@ public class User {
 }
 ```
 ### 3. Генерируйте валидные объекты!
+
 ```java
-import io.github.victoriasemkina.validated.ValidatedBuilder;
+import io.github.victoriasemkina.validated.core.ValidatedBuilder;
 
 public class Demo {
     public static void main(String[] args) {
         // Просто: Получите валидного User со случайными данными
         User randomUser = ValidatedBuilder.forClass(User.class)
-                                          .buildValid();
+                .buildValid();
         System.out.println(randomUser.getCorporateEmail());
         // Вывод: John.Doe@company.com (паттерн firstName.lastName)
 

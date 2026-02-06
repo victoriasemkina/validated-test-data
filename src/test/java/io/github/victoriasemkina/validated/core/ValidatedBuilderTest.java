@@ -1,10 +1,7 @@
-package io.github.victoriasemkina.validated;
+package io.github.victoriasemkina.validated.core;
 
-import io.github.victoriasemkina.validated.testmodel.ComplexModel;
-import io.github.victoriasemkina.validated.testmodel.NotNullModel;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import io.github.victoriasemkina.validated.testmodel.common.ComplexModel;
+import io.github.victoriasemkina.validated.testmodel.common.NotNullModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 

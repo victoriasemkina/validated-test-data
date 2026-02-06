@@ -1,4 +1,4 @@
-import io.github.victoriasemkina.validated.ValidatedBuilder;
+import io.github.victoriasemkina.validated.core.ValidatedBuilder;
 
 public class TestExample {
     private String firstName;

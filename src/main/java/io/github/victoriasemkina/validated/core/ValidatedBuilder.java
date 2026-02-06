@@ -1,9 +1,11 @@
-package io.github.victoriasemkina.validated;
+package io.github.victoriasemkina.validated.core;
 
-import io.github.victoriasemkina.validated.generator.DefaultGenerator;
-import io.github.victoriasemkina.validated.generator.EmailGenerator;
-import io.github.victoriasemkina.validated.generator.StringGenerator;
-import io.github.victoriasemkina.validated.generator.ValueGenerator;
+import io.github.victoriasemkina.validated.generator.primitive.BigDecimalGenerator;
+import io.github.victoriasemkina.validated.generator.primitive.DefaultGenerator;
+import io.github.victoriasemkina.validated.generator.primitive.StringGenerator;
+import io.github.victoriasemkina.validated.generator.semantic.EmailGenerator;
+import io.github.victoriasemkina.validated.generator.temporal.LocalDateGenerator;
+import io.github.victoriasemkina.validated.generator.temporal.LocalDateTimeGenerator;
 import io.github.victoriasemkina.validated.model.FieldDescriptor;
 import io.github.victoriasemkina.validated.rule.RuleEngine;
 import jakarta.validation.ConstraintViolation;
@@ -12,7 +14,13 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.ArrayList;
 
 /**
  * Главный класс-билдер для генерации валидных объектов.
@@ -32,6 +40,9 @@ public class ValidatedBuilder<T> {
         this.generators = List.of(
                 new EmailGenerator(),
                 new StringGenerator(),
+                new BigDecimalGenerator(),
+                new LocalDateGenerator(),
+                new LocalDateTimeGenerator(),
                 new DefaultGenerator()
         );
         this.ruleEngine = new RuleEngine(); // Инициализация движка правил
@@ -156,6 +167,27 @@ public class ValidatedBuilder<T> {
         for (Field field : fields) {
             descriptors.add(FieldDescriptor.from(field));
         }
+
+        // Сортируем поля по приоритету зависимостей:
+        // 1. Поля с именем (зависимости) → самые первые
+        // 2. Email-поля (зависимые) → после имени
+        // 3. Остальные → в алфавитном порядке
+        descriptors.sort((f1, f2) -> {
+            String n1 = f1.name().toLowerCase();
+            String n2 = f2.name().toLowerCase();
+
+            boolean isName1 = n1.contains("name") || n1.contains("first") || n1.contains("last");
+            boolean isName2 = n2.contains("name") || n2.contains("first") || n2.contains("last");
+            if (isName1 && !isName2) return -1;
+            if (!isName1 && isName2) return 1;
+
+            boolean isEmail1 = n1.contains("email") || n1.contains("mail");
+            boolean isEmail2 = n2.contains("email") || n2.contains("mail");
+            if (isEmail1 && !isEmail2) return 1;   // email позже
+            if (!isEmail1 && isEmail2) return -1;  // не-email раньше
+
+            return n1.compareTo(n2);
+        });
 
         return descriptors;
     }

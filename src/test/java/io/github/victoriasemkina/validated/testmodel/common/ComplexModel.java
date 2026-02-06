@@ -1,4 +1,4 @@
-package io.github.victoriasemkina.validated.testmodel;
+package io.github.victoriasemkina.validated.testmodel.common;
 
 import jakarta.validation.constraints.*;
 

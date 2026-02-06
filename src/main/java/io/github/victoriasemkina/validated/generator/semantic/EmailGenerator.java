@@ -1,12 +1,12 @@
-package io.github.victoriasemkina.validated.generator;
+package io.github.victoriasemkina.validated.generator.semantic;
 
+import io.github.victoriasemkina.validated.core.ValueGenerator;
 import io.github.victoriasemkina.validated.model.FieldDescriptor;
 import jakarta.validation.constraints.Email;
 import net.datafaker.Faker;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 /**
  * Специальный генератор для email-полей.

@@ -53,7 +53,11 @@ public class RuleEngine {
     public Optional<Object> applyRules(FieldDescriptor field, Map<String, Object> context) {
         for (Rule rule : rules) {
             if (rule.matches(field, context)) {
-                return Optional.of(rule.generate(field, context));
+                Object result = rule.generate(field, context);
+                // Защита от null — если правило вернуло null, пропускаем его
+                if (result != null) {
+                    return Optional.of(result);
+                }
             }
         }
         return Optional.empty();

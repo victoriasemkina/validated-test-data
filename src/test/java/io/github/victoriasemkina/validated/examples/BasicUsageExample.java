@@ -1,7 +1,10 @@
 package io.github.victoriasemkina.validated.examples;
 
-import io.github.victoriasemkina.validated.ValidatedBuilder;
-import jakarta.validation.constraints.*;
+import io.github.victoriasemkina.validated.core.ValidatedBuilder;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 
 /**
  * Простой пример использования библиотеки Validated Test Data.
